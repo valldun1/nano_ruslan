@@ -175,7 +175,7 @@ class SafeFileHistory(FileHistory):
 app = typer.Typer(
     name="nanobot",
     context_settings={"help_option_names": ["-h", "--help"]},
-    help=f"{__logo__} nanobot - Personal AI Assistant",
+    help=f"{__logo__} NanoRuslan — лёгкий AI-агент для русскоязычных",
     no_args_is_help=True,
 )
 
@@ -332,7 +332,7 @@ def _print_agent_response(
     body = _response_renderable(content, render_markdown, metadata)
     if show_header:
         console.print()
-        console.print(f"[cyan]{__logo__} nanobot[/cyan]")
+        console.print(f"[cyan]{__logo__} NanoRuslan[/cyan]")
     console.print(body)
     console.print()
 
@@ -368,7 +368,7 @@ async def _print_interactive_response(
         ansi = _render_interactive_ansi(
             lambda c: (
                 c.print(),
-                c.print(f"[cyan]{__logo__} nanobot[/cyan]"),
+                c.print(f"[cyan]{__logo__} NanoRuslan[/cyan]"),
                 c.print(_response_renderable(content, render_markdown, metadata)),
                 c.print(),
             )
@@ -523,7 +523,7 @@ async def _read_interactive_input_async() -> str:
 
 def version_callback(value: bool):
     if value:
-        console.print(f"{__logo__} nanobot v{__version__}")
+        console.print(f'{__logo__} NanoRuslan v{__version__}')
         raise typer.Exit()
 
 
@@ -626,7 +626,7 @@ def onboard(
         agent_cmd += f" --config {config_path}"
         gateway_cmd += f" --config {config_path}"
 
-    console.print(f"\n{__logo__} nanobot is ready!")
+    console.print(f'\n{__logo__} NanoRuslan готов!')
     console.print("\nNext steps:")
     if wizard:
         console.print(f"  1. Chat: [cyan]{agent_cmd}[/cyan]")
