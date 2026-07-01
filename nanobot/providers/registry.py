@@ -611,6 +611,32 @@ PROVIDERS: tuple[ProviderSpec, ...] = (
         backend="openai_compat",
         default_api_base="https://qianfan.baidubce.com/v2"
     ),
+    # === Russian providers ================================================
+    # YandexGPT: Yandex's LLM, requires special authorization.
+    # API key format: "folder_id:iam_token" (flder_id:api_key) for service accounts.
+    # API: https://llm.api.cloud.yandex.net/foundationModels/v1/
+    ProviderSpec(
+        name="yandexgpt",
+        keywords=("yandex", "yandexgpt", "yagpt"),
+        env_key="YANDEXGPT_API_KEY",
+        display_name="YandexGPT",
+        backend="openai_compat",
+        default_api_base="https://llm.api.cloud.yandex.net/foundationModels/v1",
+        is_direct=True,
+    ),
+    # GigaChat: Sber's LLM, requires OAuth 2.0 token exchange before API calls.
+    # API key format: client_id:client_secret
+    # Uses two-step auth: POST /api/v2/oauth → get token → use in Bearer header.
+    ProviderSpec(
+        name="gigachat",
+        keywords=("gigachat", "sber"),
+        env_key="GIGACHAT_API_KEY",
+        display_name="GigaChat",
+        backend="openai_compat",
+        detect_by_base_keyword="gigachat",
+        default_api_base="https://gigachat.devices.sberbank.ru/api/v1",
+        is_direct=True,
+    ),
 )
 
 
