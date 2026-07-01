@@ -748,7 +748,7 @@ def sync_workspace_templates(workspace: Path, silent: bool = False) -> list[str]
         from rich.console import Console
 
         for name in added:
-            Console().print(f"  [dim]Created {name}[/dim]")
+            Console().print(f"  [bright_black]Создано {name}[/bright_black]")
 
     # Initialize git for memory version control
     try:

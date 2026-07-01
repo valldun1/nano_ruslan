@@ -1,4 +1,4 @@
-"""High-level programmatic interface to nanobot."""
+"""Высокоуровневый программный интерфейс NanoRuslan."""
 
 from __future__ import annotations
 

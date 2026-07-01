@@ -1,6 +1,4 @@
-"""
-Entry point for running nanobot as a module: python -m nanobot
-"""
+"""Точка входа для запуска NanoRuslan как модуля: python -m nanobot"""
 
 from nanobot.cli.commands import app
 

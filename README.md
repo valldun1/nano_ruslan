@@ -6,6 +6,7 @@
 <div align="center">
   <p>
     <a href="https://nanobot.wiki/docs/latest/getting-started/nanobot-overview">English</a> |
+    <a href="README.ru.md">🇷🇺 Русский</a> |
     <a href="https://nanobot.wiki/cn/docs/latest/getting-started/nanobot-overview">简体中文</a> |
     <a href="https://nanobot.wiki/zh-Hant/docs/latest/getting-started/nanobot-overview">繁體中文</a> |
     <a href="https://nanobot.wiki/es/docs/latest/getting-started/nanobot-overview">Español</a> |
@@ -34,13 +35,13 @@
   </p>
 </div>
 
-🐈 **nanobot** is an open-source, ultra-lightweight personal AI agent you can truly own. It keeps the agent core small and readable while giving you the practical pieces for real long-running work: WebUI, chat channels, tools, memory, MCP, model routing, automation, and deployment.
+🐈 **NanoRuslan** is an open-source, ultra-lightweight personal AI agent you can truly own. It keeps the agent core small and readable while giving you the practical pieces for real long-running work: WebUI, chat channels, tools, memory, MCP, model routing, automation, and deployment.
 
 ## Start Here
 
 | You want to... | Go to |
 |---|---|
-| Install nanobot with no terminal/config background | [Start Without Technical Background](./docs/start-without-technical-background.md) |
+| Install NanoRuslan with no terminal/config background | [Start Without Technical Background](./docs/start-without-technical-background.md) |
 | Install quickly and get one CLI reply | [Install](#-install) and [Quick Start](#-quick-start) |
 | Open the bundled browser UI after the CLI works | [WebUI](#-webui) |
 | Connect Telegram, Discord, WeChat, Slack, Email, or another chat app | [Chat Apps](./docs/chat-apps.md) |
@@ -202,7 +203,7 @@
 </details>
 
 
-## 💡 Why nanobot
+## 💡 Why NanoRuslan
 
 - **Persistent workflows**: goals, memory, tools, and chat context survive long-running work.
 - **Chat-native reach**: WebUI, API, Telegram, Feishu, Slack, Discord, Teams, and email.
@@ -237,7 +238,7 @@ Windows PowerShell:
 irm https://raw.githubusercontent.com/HKUDS/nanobot/main/scripts/install.ps1 | iex
 ```
 
-The default command installs or upgrades `nanobot-ai` from PyPI, then starts `nanobot onboard --wizard`. It avoids system-wide pip installs by using an active virtual environment, `uv`, `pipx`, or a managed venv under `~/.nanobot/venv`. If Quick Start finishes and you enabled the WebSocket channel, skip the manual initialize/configure steps below and go straight to **Open the WebUI**.
+The default command installs or upgrades `nanobot-ai` from PyPI, then starts `nanoruslan onboard --wizard`. It avoids system-wide pip installs by using an active virtual environment, `uv`, `pipx`, or a managed venv under `~/.nanobot/venv`. If Quick Start finishes and you enabled the WebSocket channel, skip the manual initialize/configure steps below and go straight to **Open the WebUI**.
 
 To preview the plan without changing your environment, pass `--dry-run`; combine it with `--dev` when you want to preview the main-branch install.
 
@@ -286,7 +287,7 @@ python -m pip install -e .
 Verify the install:
 
 ```bash
-nanobot --version
+nanoruslan --version
 ```
 
 ## 🚀 Quick Start
@@ -296,16 +297,16 @@ nanobot --version
 Skip this step if the one-command setup already started the wizard and Quick Start finished there.
 
 ```bash
-nanobot onboard
+nanoruslan onboard
 ```
 
-Use `nanobot onboard --wizard` if you prefer an interactive setup.
+Use `nanoruslan onboard --wizard` if you prefer an interactive setup.
 
 **2. Configure** (`~/.nanobot/config.json`)
 
 Skip this step if you already configured provider and model settings in the wizard.
 
-`nanobot onboard` creates `~/.nanobot/config.json` and `~/.nanobot/workspace/`. Configure these **two parts** in the config file. Add or merge the following blocks into the existing file instead of replacing the whole file.
+`nanoruslan onboard` creates `~/.nanobot/config.json` and `~/.nanobot/workspace/`. Configure these **two parts** in the config file. Add or merge the following blocks into the existing file instead of replacing the whole file.
 
 The example below uses a generic OpenAI-compatible `custom` provider so the compact path does not recommend one hosted service. Provider examples are recipes, not rankings or endorsements. For copyable provider-specific setup, see [Provider Cookbook](./docs/provider-cookbook.md).
 
@@ -361,25 +362,25 @@ For another provider, the same config shape still applies:
 If Quick Start enabled the WebSocket channel, start the gateway:
 
 ```bash
-nanobot gateway
+nanoruslan gateway
 ```
 
 Leave that terminal open, then open `http://127.0.0.1:8765` in your browser. Enter the WebUI password you set in the wizard, then send your first message there.
-Prefer not to keep a terminal open? Use `nanobot gateway --background`, then manage it with `nanobot gateway status`, `logs`, `restart`, and `stop`.
+Prefer not to keep a terminal open? Use `nanoruslan gateway --background`, then manage it with `nanoruslan gateway status`, `logs`, `restart`, and `stop`.
 
 For manual or terminal-only setup, test one CLI message:
 
 ```bash
-nanobot status
-nanobot agent -m "Hello!"
+nanoruslan status
+nanoruslan agent -m "Hello!"
 ```
 
-In `nanobot status`, it is normal for most providers to say `not set`. The active preset's provider should be configured, and `Config` plus `Workspace` should show check marks.
+In `nanoruslan status`, it is normal for most providers to say `not set`. The active preset's provider should be configured, and `Config` plus `Workspace` should show check marks.
 
 If that works, start an interactive chat:
 
 ```bash
-nanobot agent
+nanoruslan agent
 ```
 
 Need help with `PATH`, API keys, provider/model matching, or JSON errors? See the fuller [Install and Quick Start](./docs/quick-start.md) and [Troubleshooting](./docs/troubleshooting.md).
@@ -388,7 +389,7 @@ Need help with `PATH`, API keys, provider/model matching, or JSON errors? See th
 - Want to understand provider/model matching? See [Providers and Models](./docs/providers.md)
 - Want web search, MCP, security settings, or more config options? See [Configuration](./docs/configuration.md)
 - Want to run locally? See [Ollama](./docs/providers.md#ollama), [vLLM or another local OpenAI-compatible server](./docs/providers.md#vllm-or-other-local-openai-compatible-server), and the full [provider reference](./docs/configuration.md#providers).
-- Want to run nanobot in chat apps like Telegram, Discord, WeChat or Feishu? See [Chat Apps](./docs/chat-apps.md)
+- Want to run NanoRuslan in chat apps like Telegram, Discord, WeChat or Feishu? See [Chat Apps](./docs/chat-apps.md)
 - Want Docker or Linux service deployment? See [Deployment](./docs/deployment.md)
 
 ## 🌐 WebUI
@@ -418,10 +419,10 @@ Merge this block into your existing config:
 **2. Start the gateway**
 
 ```bash
-nanobot gateway
+nanoruslan gateway
 ```
 
-Use `nanobot gateway --background` for a local background process you can manage later with `nanobot gateway status`, `logs`, `restart`, and `stop`.
+Use `nanoruslan gateway --background` for a local background process you can manage later with `nanoruslan gateway status`, `logs`, `restart`, and `stop`.
 
 **3. Open the WebUI**
 
@@ -438,7 +439,7 @@ The WebUI is served by the WebSocket channel on port `8765` by default. The gate
   <img src="images/nanobot_arch.png" alt="nanobot architecture" width="800">
 </p>
 
-🐈 nanobot stays lightweight by centering everything around a small agent loop: messages come in from chat apps, the LLM decides when tools are needed, and memory or skills are pulled in only as context instead of becoming a heavy orchestration layer. That keeps the core path readable and easy to extend, while still letting you add channels, tools, memory, and deployment options without turning the system into a monolith.
+🐈 NanoRuslan stays lightweight by centering everything around a small agent loop: messages come in from chat apps, the LLM decides when tools are needed, and memory or skills are pulled in only as context instead of becoming a heavy orchestration layer. That keeps the core path readable and easy to extend, while still letting you add channels, tools, memory, and deployment options without turning the system into a monolith.
 
 ## ✨ Features
 
@@ -474,10 +475,10 @@ Browse the [repo docs](./docs/README.md) for the latest features and GitHub deve
 - Choose a provider/model: [Providers and Models](./docs/providers.md)
 - Copy provider setup recipes: [Provider Cookbook](./docs/provider-cookbook.md)
 - Debug setup and runtime failures: [Troubleshooting](./docs/troubleshooting.md)
-- Talk to your nanobot with familiar chat apps: [Chat Apps](./docs/chat-apps.md)
+- Talk to your NanoRuslan with familiar chat apps: [Chat Apps](./docs/chat-apps.md)
 - Configure providers, web search, MCP, and runtime behavior: [Configuration](./docs/configuration.md)
-- Integrate nanobot with local tools and automations: [OpenAI-Compatible API](./docs/openai-api.md) · [Python SDK](./docs/python-sdk.md)
-- Run nanobot with Docker or as a Linux service: [Deployment](./docs/deployment.md)
+- Integrate NanoRuslan with local tools and automations: [OpenAI-Compatible API](./docs/openai-api.md) · [Python SDK](./docs/python-sdk.md)
+- Run NanoRuslan with Docker or as a Linux service: [Deployment](./docs/deployment.md)
 
 ## 🤝 Contribute & Roadmap
 
@@ -519,6 +520,6 @@ This project was started by [Xubin Ren](https://github.com/re-bin) as a personal
 </div>
 
 <p align="center">
-  <em> Thanks for visiting ✨ nanobot!</em><br><br>
+  <em> Thanks for visiting ✨ NanoRuslan!</em><br><br>
   <img src="https://visitor-badge.laobi.icu/badge?page_id=HKUDS.nanobot&style=for-the-badge&color=00d4ff" alt="Views">
 </p>

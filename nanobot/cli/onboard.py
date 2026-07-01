@@ -72,11 +72,11 @@ _BACK_PRESSED = object()  # Sentinel value for back navigation
 # offer existing presets as choices (e.g. AgentDefaults.model_preset).
 _MODEL_PRESET_CACHE: set[str] = set()
 
-_QUICK_START_CUSTOM_PROVIDER_CHOICE = "Other OpenAI-compatible"
+_QUICK_START_CUSTOM_PROVIDER_CHOICE = "Другой OpenAI-совместимый"
 
-_CLEAR_CHOICE = "Clear value"
-_QUICK_START_MENU_CHOICE = "[Q] Quick Start"
-_QUICK_START_STEPS = ("Provider setup", "WebSocket channel", "Review")
+_CLEAR_CHOICE = "Очистить"
+_QUICK_START_MENU_CHOICE = "[Q] Быстрый старт"
+_QUICK_START_STEPS = ("Провайдер", "WebSocket канал", "Проверка")
 _QUICK_START_ENDPOINT_CHOICES: dict[str, tuple[_QuickStartEndpointChoice, ...]] = {
     "zhipu": (
         _QuickStartEndpointChoice("Standard API", "https://open.bigmodel.cn/api/paas/v4"),
@@ -110,8 +110,8 @@ _UI_TEXT = "#A9B7C6"
 _UI_MUTED = "#80868B"
 _UI_SUCCESS = "#6AAB73"
 _PROMPT_ESCAPE_TIMEOUT_SECONDS = 0.05
-_CHANNEL_LOGIN_CHOICE = "Login with QR/link"
-_CHANNEL_ADVANCED_CHOICE = "Edit advanced settings"
+_CHANNEL_LOGIN_CHOICE = "Войти по QR/ссылке"
+_CHANNEL_ADVANCED_CHOICE = "Расширенные настройки"
 
 
 def _get_questionary():
@@ -339,18 +339,18 @@ def _mask_value(value: str) -> str:
 def _format_value(value: Any, rich: bool = True, field_name: str = "") -> str:
     """Single recursive entry point for safe value display. Handles any depth."""
     if value is None or value == "" or value == {} or value == []:
-        return "[dim]not set[/dim]" if rich else "[not set]"
+        return "[bright_black]не задано[/bright_black]" if rich else "[не задано]"
     if _is_sensitive_field(field_name) and isinstance(value, str):
         masked = _mask_value(value)
-        return f"[dim]{masked}[/dim]" if rich else masked
+        return f"[bright_black]{masked}[/bright_black]" if rich else masked
     if isinstance(value, BaseModel):
         parts = []
         for fname, _finfo in type(value).model_fields.items():
             fval = getattr(value, fname, None)
             formatted = _format_value(fval, rich=False, field_name=fname)
-            if formatted != "[not set]":
+            if formatted != "[не задано]":
                 parts.append(f"{fname}={formatted}")
-        return ", ".join(parts) if parts else ("[dim]not set[/dim]" if rich else "[not set]")
+        return ", ".join(parts) if parts else ("[bright_black]не задано[/bright_black]" if rich else "[не задано]")
     if isinstance(value, list):
         return ", ".join(str(v) for v in value)
     if isinstance(value, dict):
@@ -359,7 +359,7 @@ def _format_value(value: Any, rich: bool = True, field_name: str = "") -> str:
         for k, v in value.items():
             formatted = _format_value(v, rich=False, field_name=str(k))
             parts.append(f"{k}: {formatted}")
-        return ", ".join(parts) if parts else ("[dim]not set[/dim]" if rich else "[not set]")
+        return ", ".join(parts) if parts else ("[bright_black]не задано[/bright_black]" if rich else "[не задано]")
     return str(value)
 
 
@@ -456,15 +456,15 @@ def _show_main_menu_header() -> None:
     console.print()
     body = Table.grid(expand=True)
     body.add_column(ratio=1)
-    body.add_row(f"{__logo__} [bold {_UI_TEXT}]nanobot[/] [{_UI_MUTED}]v{__version__}[/]")
-    body.add_row(f"[{_UI_ACCENT}]Quick Start asks for the provider, credentials, and model.[/]")
+    body.add_row(f"{__logo__} [bold {_UI_TEXT}]nanoruslan[/] [{_UI_MUTED}]v{__version__}[/]")
+    body.add_row(f"[{_UI_ACCENT}]Быстрый старт — выбери провайдера, API-ключ и модель.[/]")
     body.add_row(
-        f"[{_UI_MUTED}]Use Advanced later for chat apps, tools, or provider-specific details.[/]"
+        f"[{_UI_MUTED}]Расширенные настройки — для чат-каналов, инструментов и доп. параметров.[/]"
     )
     console.print(
         Panel(
             body,
-            title=f"[bold {_UI_TEXT}]Setup Wizard[/]",
+            title=f"[bold {_UI_TEXT}]Мастер настройки[/]",
             border_style=_UI_BORDER,
             padding=(1, 2),
         )
@@ -594,10 +594,10 @@ def _input_with_existing(
     if has_existing and not isinstance(current, list):
         choice = _get_questionary().select(
             display_name,
-            choices=["Enter new value", "Keep existing value"],
-            default="Keep existing value",
+            choices=["Ввести новое", "Оставить текущее"],
+            default="Оставить текущее",
         ).ask()
-        if choice == "Keep existing value" or choice is None:
+        if choice == "Оставить текущее" or choice is None:
             return None
 
     return _input_text(display_name, current, field_type, field_info=field_info)
@@ -664,24 +664,24 @@ def _input_context_window_with_recommendation(
     """Get context window input with option to fetch recommended value."""
     current_val = current if current else ""
 
-    choices = ["Enter new value"]
+    choices = ["Ввести новое"]
     if current_val:
-        choices.append("Keep existing value")
-    choices.append("[?] Get recommended value")
+        choices.append("Оставить текущее")
+    choices.append("[?] Получить рекомендованное значение")
 
     choice = _get_questionary().select(
         display_name,
         choices=choices,
-        default="Enter new value",
+        default="Ввести новое",
     ).ask()
 
     if choice is None:
         return None
 
-    if choice == "Keep existing value":
+    if choice == "Оставить текущее":
         return None
 
-    if choice == "[?] Get recommended value":
+    if choice == "[?] Получить рекомендованное значение":
         # Get the model name from the model object
         model_name = getattr(model_obj, "model", None)
         if not model_name:
@@ -802,28 +802,28 @@ def _handle_fallback_models_field(
                 else:
                     console.print(f"  {idx}. {item}")
         else:
-            console.print("  [dim]empty[/dim]")
+            console.print("  [bright_black]пусто[/bright_black]")
         console.print()
 
-        choices = ["[+] Add preset"]
+        choices = ["[+] Добавить пресет"]
         if items:
-            choices.append("[-] Remove last")
-            choices.append("[X] Clear all")
+            choices.append("[-] Удалить последний")
+            choices.append("[X] Очистить всё")
         choices.append("[Done]")
-        choices.append("<- Back")
+        choices.append("<- Назад")
 
         answer = _get_questionary().select(
-            "Manage fallback models:",
+            "Управление fallback-моделями:",
             choices=choices,
             qmark=">",
         ).ask()
 
-        if answer is None or answer == "<- Back":
+        if answer is None or answer == "<- Назад":
             return
         if answer == "[Done]":
             setattr(working_model, field_name, items)
             return
-        if answer == "[+] Add preset":
+        if answer == "[+] Добавить пресет":
             if not preset_names:
                 console.print("[yellow]! No presets defined yet.[/yellow]")
                 _get_questionary().press_any_key_to_continue().ask()
@@ -837,9 +837,9 @@ def _handle_fallback_models_field(
             if picked is _BACK_PRESSED or picked is None:
                 continue
             items.append(picked)
-        elif answer == "[-] Remove last" and items:
+        elif answer == "[-] Удалить последний" and items:
             items.pop()
-        elif answer == "[X] Clear all" and items:
+        elif answer == "[X] Очистить всё" and items:
             items.clear()
 
 
@@ -902,7 +902,7 @@ def _configure_pydantic_model(
         if name not in skip_fields
     ]
     if not fields:
-        console.print(f"[dim]{display_name}: No configurable fields[/dim]")
+        console.print(f"[bright_black]{display_name}: нет настраиваемых полей[/bright_black]")
         return working_model
 
     def get_choices() -> list[str]:
@@ -971,7 +971,7 @@ def _configure_pydantic_model(
         if field_name in _SELECT_FIELD_HINTS:
             choices_list, hint = _SELECT_FIELD_HINTS[field_name]
             select_choices = choices_list + [_CLEAR_CHOICE]
-            console.print(f"[dim]  Hint: {hint}[/dim]")
+            console.print(f"[bright_black]  Hint: {hint}[/bright_black]")
             new_value = _select_with_back(
                 field_display, select_choices, default=current_value or select_choices[0]
             )
@@ -1040,7 +1040,7 @@ def _try_auto_fill_context_window(model: BaseModel, new_model_name: str) -> None
             f"{format_token_count(context_limit)} tokens[/]"
         )
     else:
-        console.print("[dim]Could not auto-fill context window - model not in database[/dim]")
+        console.print("[bright_black]Не удалось автозаполнить окно контекста — модель не найдена в базе[/bright_black]")
 
 
 # --- Model Preset Configuration ---
@@ -1063,8 +1063,8 @@ def _configure_model_presets(config: Config) -> None:
             choice = f"{name} - {preset.model}"
             choices.append(choice)
             choice_to_preset[choice] = name
-        choices.append("[+] Add new preset")
-        choices.append("<- Back")
+        choices.append("[+] Добавить новый пресет")
+        choices.append("<- Назад")
         return choices, choice_to_preset
 
     last_preset_name: str | None = None
@@ -1083,15 +1083,15 @@ def _configure_model_presets(config: Config) -> None:
                         default_choice = choice
                         break
             answer = _select_with_back(
-                "Select preset:", choices, default=default_choice
+                "Выбери пресет:", choices, default=default_choice
             )
 
-            if answer is _BACK_PRESSED or answer is None or answer == "<- Back":
+            if answer is _BACK_PRESSED or answer is None or answer == "<- Назад":
                 break
 
             assert isinstance(answer, str)
 
-            if answer == "[+] Add new preset":
+            if answer == "[+] Добавить новый пресет":
                 name_input = _get_questionary().text(
                     "Preset name:",
                     validate=lambda t: True if t and t.strip() else "Name cannot be empty",
@@ -1156,7 +1156,7 @@ def _configure_model_presets(config: Config) -> None:
                     _sync_preset_cache(config)
 
         except KeyboardInterrupt:
-            console.print("\n[dim]Returning to main menu...[/dim]")
+            console.print("\n[bright_black]Возврат в главное меню...[/bright_black]")
             break
 
 
@@ -1220,13 +1220,13 @@ def _configure_providers(config: Config) -> None:
                 choices.append(f"{display} *")
             else:
                 choices.append(display)
-        return choices + ["<- Back"]
+        return choices + ["<- Назад"]
 
     last_provider_key: str | None = None
     while True:
         try:
             console.clear()
-            _show_section_header("LLM Providers", "Select a provider to configure API key and endpoint")
+            _show_section_header("LLM-провайдеры", "Выбери провайдера для настройки API-ключа и endpoint")
             choices = get_provider_choices()
             default_choice = None
             if last_provider_key:
@@ -1237,10 +1237,10 @@ def _configure_providers(config: Config) -> None:
                             default_choice = c
                             break
             answer = _select_with_back(
-                "Select provider:", choices, default=default_choice
+                "Выбери провайдера:", choices, default=default_choice
             )
 
-            if answer is _BACK_PRESSED or answer is None or answer == "<- Back":
+            if answer is _BACK_PRESSED or answer is None or answer == "<- Назад":
                 break
 
             # Type guard: answer is now guaranteed to be a string
@@ -1255,7 +1255,7 @@ def _configure_providers(config: Config) -> None:
                     break
 
         except KeyboardInterrupt:
-            console.print("\n[dim]Returning to main menu...[/dim]")
+            console.print("\n[bright_black]Возврат в главное меню...[/bright_black]")
             break
 
 
@@ -1332,7 +1332,7 @@ def _run_channel_login(
         channel = channel_cls(model, bus=None)
         success = asyncio.run(channel.login(force=False))
     except KeyboardInterrupt:
-        console.print("\n[dim]Login cancelled.[/dim]")
+        console.print("\n[bright_black]Вход отменён.[/bright_black]")
         return False
     except Exception as exc:
         logger.exception("{} login failed", display_name)
@@ -1367,11 +1367,11 @@ def _configure_channel(config: Config, channel_name: str) -> None:
     channel_cls = _get_channel_class(channel_name)
     if _channel_supports_login(channel_cls):
         action = _select_with_back(
-            f"Configure {display_name}:",
-            [_CHANNEL_LOGIN_CHOICE, _CHANNEL_ADVANCED_CHOICE, "<- Back"],
+            f"Настройка {display_name}:",
+            [_CHANNEL_LOGIN_CHOICE, _CHANNEL_ADVANCED_CHOICE, "<- Назад"],
             default=_CHANNEL_LOGIN_CHOICE,
         )
-        if action is _BACK_PRESSED or action is None or action == "<- Back":
+        if action is _BACK_PRESSED or action is None or action == "<- Назад":
             return
         if action == _CHANNEL_LOGIN_CHOICE:
             _run_channel_login(config, channel_name, model, display_name)
@@ -1389,18 +1389,18 @@ def _configure_channel(config: Config, channel_name: str) -> None:
 def _configure_channels(config: Config) -> None:
     """Configure chat channels."""
     channel_names = list(_get_channel_names().keys())
-    choices = channel_names + ["<- Back"]
+    choices = channel_names + ["<- Назад"]
 
     last_choice: str | None = None
     while True:
         try:
             console.clear()
-            _show_section_header("Chat Channels", "Select a channel to configure connection settings")
+            _show_section_header("Каналы связи", "Выбери канал для настройки подключения")
             answer = _select_with_back(
-                "Select channel:", choices, default=last_choice
+                "Выбери канал:", choices, default=last_choice
             )
 
-            if answer is _BACK_PRESSED or answer is None or answer == "<- Back":
+            if answer is _BACK_PRESSED or answer is None or answer == "<- Назад":
                 break
 
             # Type guard: answer is now guaranteed to be a string
@@ -1408,7 +1408,7 @@ def _configure_channels(config: Config) -> None:
             last_choice = answer
             _configure_channel(config, answer)
         except KeyboardInterrupt:
-            console.print("\n[dim]Returning to main menu...[/dim]")
+            console.print("\n[bright_black]Возврат в главное меню...[/bright_black]")
             break
 
 
@@ -1499,7 +1499,7 @@ def _show_summary(config: Config) -> None:
             else f"[{_UI_MUTED}]not configured[/]"
         )
         provider_rows.append((display, status))
-    _print_summary_panel(provider_rows, "LLM Providers")
+    _print_summary_panel(provider_rows, "LLM-провайдеры")
 
     # Channels
     channel_rows = []
@@ -1515,13 +1515,13 @@ def _show_summary(config: Config) -> None:
         else:
             status = f"[{_UI_MUTED}]not configured[/]"
         channel_rows.append((display, status))
-    _print_summary_panel(channel_rows, "Chat Channels")
+    _print_summary_panel(channel_rows, "Каналы связи")
 
     # Model Presets
     preset_rows = []
     for name, preset in config.model_presets.items():
         preset_rows.append((name, f"{preset.model} - ctx {preset.context_window_tokens}"))
-    _print_summary_panel(preset_rows, "Model Presets")
+    _print_summary_panel(preset_rows, "Пресеты моделей")
 
     # Settings sections
     for title, model in [
@@ -1626,11 +1626,11 @@ def _select_quick_start_api_base(
     if endpoint_choices:
         choices = {choice.label: choice.api_base for choice in endpoint_choices}
         answer = _select_with_back(
-            f"Which {provider_display} endpoint should Quick Start use?",
-            list(choices) + ["<- Back"],
+            f"Какой endpoint {provider_display} использовать?",
+            list(choices) + ["<- Назад"],
             default=endpoint_choices[0].label,
         )
-        if answer is _BACK_PRESSED or answer == "<- Back":
+        if answer is _BACK_PRESSED or answer == "<- Назад":
             return _BACK_PRESSED
         if answer is None:
             return None
@@ -1664,10 +1664,10 @@ def _configure_quick_start_provider(config: Config) -> bool | object:
 
         provider_choices = _get_quick_start_provider_choices()
         answer = _select_with_back(
-            "Which provider do you want to use?",
-            list(provider_choices) + ["<- Back"],
+            "Какого провайдера будем использовать?",
+            list(provider_choices) + ["<- Назад"],
         )
-        if answer is _BACK_PRESSED or answer is None or answer == "<- Back":
+        if answer is _BACK_PRESSED or answer is None or answer == "<- Назад":
             return _BACK_PRESSED
         assert isinstance(answer, str)
         provider_name = provider_choices[answer]
@@ -1739,10 +1739,10 @@ def _enable_quick_start_websocket_defaults(config: Config) -> bool:
     """Enable local WebUI with the default WebSocket settings."""
     _show_quick_start_progress(2)
     console.print(
-        f"[{_UI_ACCENT}]Quick Start will enable the WebSocket channel for the local WebUI.[/]"
+        f"[{_UI_ACCENT}]Быстрый старт включит WebSocket-канал для WebUI.[/]"
     )
     console.print(
-        f"[{_UI_MUTED}]This lets the browser UI at http://127.0.0.1:8765 connect to nanobot.[/]"
+        f"[{_UI_MUTED}]Это позволит браузеру http://127.0.0.1:8765 подключиться к NanoRuslan.[/]"
     )
     console.print()
     while True:
@@ -1793,7 +1793,7 @@ def _show_quick_start_summary(config: Config) -> None:
         )
         has_api_key = is_local or bool(provider_config and provider_config.api_key)
 
-    start_command = "`nanobot gateway`"
+    start_command = "`nanoruslan gateway`"
     next_step = f"Run {start_command}"
     status = "Ready"
     if not has_api_key:
@@ -1806,7 +1806,7 @@ def _show_quick_start_summary(config: Config) -> None:
         ("WebSocket channel", "enabled"),
         ("Open", "http://127.0.0.1:8765"),
     ]
-    _print_summary_panel(rows, "Quick Start")
+    _print_summary_panel(rows, "Быстрый старт")
 
 
 def _configure_quick_start(config: Config) -> bool:
@@ -1847,19 +1847,19 @@ def _prompt_main_menu_exit(has_unsaved_changes: bool) -> str:
         return "discard"
 
     answer = _get_questionary().select(
-        "You have unsaved changes. What would you like to do?",
+        "Есть несохранённые изменения. Что делаем?",
         choices=[
-            "[S] Save and Exit",
-            "[X] Exit Without Saving",
-            "[R] Resume Editing",
+            "[S] Сохранить и выйти",
+            "[X] Выйти без сохранения",
+            "[R] Продолжить",
         ],
-        default="[R] Resume Editing",
+        default="[R] Продолжить",
         qmark=">",
     ).ask()
 
-    if answer == "[S] Save and Exit":
+    if answer == "[S] Сохранить и выйти":
         return "save"
-    if answer == "[X] Exit Without Saving":
+    if answer == "[X] Выйти без сохранения":
         return "discard"
     return "resume"
 
@@ -1868,12 +1868,12 @@ def _get_main_menu_choices(has_unsaved_changes: bool) -> list[str]:
     """Return the top-level choices, keeping save actions hidden until needed."""
     choices = [
         _QUICK_START_MENU_CHOICE,
-        "[A] Advanced Settings",
+        "[A] Расширенные настройки",
     ]
     if has_unsaved_changes:
-        choices.extend(["[S] Save and Exit", "[X] Exit Without Saving"])
+        choices.extend(["[S] Сохранить и выйти", "[X] Выйти без сохранения"])
     else:
-        choices.append("[X] Exit")
+        choices.append("[X] Выход")
     return choices
 
 
@@ -1881,45 +1881,45 @@ def _configure_advanced_settings(config: Config) -> None:
     """Show lower-frequency setup options behind one advanced menu."""
     last_choice: str | None = None
     choices = [
-        "[P] LLM Provider",
-        "[M] Model Presets",
-        "[C] Chat Channel",
-        "[H] Channel Common",
-        "[A] Agent Settings",
-        "[I] API Server",
+        "[P] LLM провайдер",
+        "[M] Модели",
+        "[C] Канал связи",
+        "[H] Общие настройки каналов",
+        "[N] Настройки агента",
+        "[I] API сервер",
         "[G] Gateway",
-        "[T] Tools",
-        "[V] View Configuration Summary",
-        "<- Back",
+        "[T] Инструменты",
+        "[V] Просмотр конфигурации",
+        "<- Назад",
     ]
     while True:
         try:
             console.clear()
             _show_section_header(
-                "Advanced Settings",
-                "Use these when the default API-key setup is not enough.",
+                "Расширенные настройки",
+                "Используй, если стандартной настройки API-ключа недостаточно.",
             )
             answer = _select_with_back(
-                "What would you like to configure?",
+                "Что будем настраивать?",
                 choices,
                 default=last_choice,
             )
         except KeyboardInterrupt:
             break
 
-        if answer is _BACK_PRESSED or answer is None or answer == "<- Back":
+        if answer is _BACK_PRESSED or answer is None or answer == "<- Назад":
             break
 
         _advanced_dispatch = {
-            "[P] LLM Provider": lambda: _configure_providers(config),
-            "[M] Model Presets": lambda: _configure_model_presets(config),
-            "[C] Chat Channel": lambda: _configure_channels(config),
-            "[H] Channel Common": lambda: _configure_general_settings(config, "Channel Common"),
-            "[A] Agent Settings": lambda: _configure_general_settings(config, "Agent Settings"),
-            "[I] API Server": lambda: _configure_general_settings(config, "API Server"),
+            "[P] LLM провайдер": lambda: _configure_providers(config),
+            "[M] Модели": lambda: _configure_model_presets(config),
+            "[C] Канал связи": lambda: _configure_channels(config),
+            "[H] Общие настройки каналов": lambda: _configure_general_settings(config, "Channel Common"),
+            "[N] Настройки агента": lambda: _configure_general_settings(config, "Agent Settings"),
+            "[I] API сервер": lambda: _configure_general_settings(config, "API Server"),
             "[G] Gateway": lambda: _configure_general_settings(config, "Gateway"),
-            "[T] Tools": lambda: _configure_general_settings(config, "Tools"),
-            "[V] View Configuration Summary": lambda: _show_summary(config),
+            "[T] Инструменты": lambda: _configure_general_settings(config, "Tools"),
+            "[V] Просмотр конфигурации": lambda: _show_summary(config),
         }
         action_fn = _advanced_dispatch.get(answer)
         if action_fn:
@@ -1955,7 +1955,7 @@ def run_onboard(initial_config: Config | None = None) -> OnboardResult:
 
         try:
             answer = _select_with_back(
-                "What would you like to do?",
+                "Что делаем?",
                 _get_main_menu_choices(_has_unsaved_changes(original_config, config)),
             )
         except KeyboardInterrupt:
@@ -1974,9 +1974,9 @@ def run_onboard(initial_config: Config | None = None) -> OnboardResult:
                 return OnboardResult(config=config, should_save=True)
             continue
 
-        if answer == "[S] Save and Exit":
+        if answer == "[S] Сохранить и выйти":
             return OnboardResult(config=config, should_save=True)
-        if answer in {"[X] Exit", "[X] Exit Without Saving"}:
+        if answer in {"[X] Выход", "[X] Выйти без сохранения"}:
             return OnboardResult(config=original_config, should_save=False)
-        if answer == "[A] Advanced Settings":
+        if answer == "[A] Расширенные настройки":
             _configure_advanced_settings(config)

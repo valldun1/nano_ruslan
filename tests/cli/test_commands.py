@@ -93,7 +93,7 @@ def test_gateway_signal_handler_first_signal_stops_and_second_forces() -> None:
 
             callback(*args)
             assert shutdown_event.is_set()
-            assert output == ["\nShutting down... Press Ctrl+C again to force."]
+            assert output == ["\nЗавершение работы... Нажми Ctrl+C снова для принудительного завершения."]
             assert not task.done()
 
             callback(*args)
@@ -194,9 +194,9 @@ def test_onboard_fresh_install(mock_paths):
     result = runner.invoke(app, ["onboard"])
 
     assert result.exit_code == 0
-    assert "Created config" in result.stdout
-    assert "Created workspace" in result.stdout
-    assert "nanobot is ready" in result.stdout
+    assert "Конфиг создан" in result.stdout
+    assert "Рабочая директория создана" in result.stdout
+    assert "NanoRuslan готов" in result.stdout
     assert config_file.exists()
     assert (workspace_dir / "AGENTS.md").exists()
     assert (workspace_dir / "memory" / "MEMORY.md").exists()
@@ -212,8 +212,8 @@ def test_onboard_existing_config_refresh(mock_paths):
     result = runner.invoke(app, ["onboard"], input="n\n")
 
     assert result.exit_code == 0
-    assert "Config already exists" in result.stdout
-    assert "existing values preserved" in result.stdout
+    assert "Конфиг уже есть" in result.stdout
+    assert "текущие значения сохранены" in result.stdout
     assert workspace_dir.exists()
     assert (workspace_dir / "AGENTS.md").exists()
 
@@ -226,8 +226,8 @@ def test_onboard_existing_config_overwrite(mock_paths):
     result = runner.invoke(app, ["onboard"], input="y\n")
 
     assert result.exit_code == 0
-    assert "Config already exists" in result.stdout
-    assert "Config reset to defaults" in result.stdout
+    assert "Конфиг уже есть" in result.stdout
+    assert "Конфиг сброшен на умолчания" in result.stdout
     assert workspace_dir.exists()
 
 
@@ -240,8 +240,8 @@ def test_onboard_existing_workspace_safe_create(mock_paths):
     result = runner.invoke(app, ["onboard"], input="n\n")
 
     assert result.exit_code == 0
-    assert "Created workspace" not in result.stdout
-    assert "Created AGENTS.md" in result.stdout
+    assert "Рабочая директория создана" not in result.stdout
+    assert "Создано AGENTS.md" in result.stdout
     assert (workspace_dir / "AGENTS.md").exists()
 
 
@@ -277,7 +277,7 @@ def test_onboard_interactive_discard_does_not_save_or_create_workspace(mock_path
     result = runner.invoke(app, ["onboard", "--wizard"])
 
     assert result.exit_code == 0
-    assert "No changes were saved" in result.stdout
+    assert "Изменения не сохранены" in result.stdout
     assert not config_file.exists()
     assert not workspace_dir.exists()
 
@@ -325,8 +325,8 @@ def test_onboard_wizard_preserves_explicit_config_in_next_steps(tmp_path, monkey
     stripped_output = _strip_ansi(result.stdout)
     compact_output = stripped_output.replace("\n", "")
     resolved_config = str(config_path.resolve())
-    assert f'nanobot agent -m "Hello!" --config {resolved_config}' in compact_output
-    assert f"nanobot gateway --config {resolved_config}" in compact_output
+    assert f'nanoruslan agent -m "Hello!" --config {resolved_config}' in compact_output
+    assert f"nanoruslan gateway --config {resolved_config}" in compact_output
 
 
 def test_config_matches_github_copilot_codex_with_hyphen_prefix():
@@ -365,7 +365,7 @@ def test_provider_logout_openai_codex_removes_local_oauth_files(tmp_path, monkey
     assert result.exit_code == 0
     assert not token_path.exists()
     assert not lock_path.exists()
-    assert "Logged out from OpenAI Codex" in result.stdout
+    assert "Выход выполнен из OpenAI Codex" in result.stdout
 
 
 def test_provider_logout_openai_codex_succeeds_when_no_local_oauth_file(monkeypatch, tmp_path):
@@ -375,7 +375,7 @@ def test_provider_logout_openai_codex_succeeds_when_no_local_oauth_file(monkeypa
     result = runner.invoke(app, ["provider", "logout", "openai-codex"])
 
     assert result.exit_code == 0
-    assert "No local OAuth credentials found for OpenAI Codex" in result.stdout
+    assert "Локальные OAuth-учётные данные для OpenAI Codex не найдены" in result.stdout
 
 
 def test_provider_logout_github_copilot_removes_local_oauth_files(tmp_path, monkeypatch):
@@ -391,7 +391,7 @@ def test_provider_logout_github_copilot_removes_local_oauth_files(tmp_path, monk
     assert result.exit_code == 0
     assert not token_path.exists()
     assert not lock_path.exists()
-    assert "Logged out from GitHub Copilot" in result.stdout
+    assert "Выход выполнен из GitHub Copilot" in result.stdout
 
 
 def test_provider_logout_github_copilot_succeeds_when_no_local_oauth_file(monkeypatch, tmp_path):
@@ -401,14 +401,14 @@ def test_provider_logout_github_copilot_succeeds_when_no_local_oauth_file(monkey
     result = runner.invoke(app, ["provider", "logout", "github-copilot"])
 
     assert result.exit_code == 0
-    assert "No local OAuth credentials found for GitHub Copilot" in result.stdout
+    assert "Локальные OAuth-учётные данные для GitHub Copilot не найдены" in result.stdout
 
 
 def test_provider_logout_rejects_unknown_provider():
     result = runner.invoke(app, ["provider", "logout", "not-a-real-provider"])
 
     assert result.exit_code == 1
-    assert "Unknown OAuth provider" in result.stdout
+    assert "Неизвестный OAuth-провайдер" in result.stdout
 
 
 def test_provider_logout_paths_resolve_to_expected_files():
@@ -432,7 +432,7 @@ def test_provider_login_rejects_unknown_provider():
     result = runner.invoke(app, ["provider", "login", "not-a-real-provider"])
 
     assert result.exit_code == 1
-    assert "Unknown OAuth provider" in result.stdout
+    assert "Неизвестный OAuth-провайдер" in result.stdout
 
 
 def test_provider_login_can_set_openai_codex_as_main_provider(tmp_path):
@@ -462,7 +462,7 @@ def test_provider_login_can_set_openai_codex_as_main_provider(tmp_path):
 
     assert result.exit_code == 0
     assert called is True
-    assert "Set openai-codex as the main provider" in result.stdout
+    assert "openai-codex установлен как основной провайдер" in result.stdout
 
     saved = Config.model_validate(json.loads(config_path.read_text(encoding="utf-8")))
     assert saved.agents.defaults.provider == "openai_codex"
@@ -491,7 +491,7 @@ def test_provider_login_can_set_github_copilot_as_main_provider(tmp_path):
         cli_commands._LOGIN_HANDLERS["github_copilot"] = original
 
     assert result.exit_code == 0
-    assert "Set github-copilot as the main provider" in result.stdout
+    assert "github-copilot установлен как основной провайдер" in result.stdout
 
     saved = Config.model_validate(json.loads(config_path.read_text(encoding="utf-8")))
     assert saved.agents.defaults.provider == "github_copilot"
@@ -521,7 +521,7 @@ def test_provider_login_model_implies_set_main_provider(tmp_path):
         cli_commands._LOGIN_HANDLERS["github_copilot"] = original
 
     assert result.exit_code == 0
-    assert "Set github-copilot as the main provider" in result.stdout
+    assert "github-copilot установлен как основной провайдер" in result.stdout
 
     saved = Config.model_validate(json.loads(config_path.read_text(encoding="utf-8")))
     assert saved.agents.defaults.provider == "github_copilot"
@@ -1422,7 +1422,7 @@ def test_agent_hints_about_deprecated_memory_window(mock_agent_runtime, tmp_path
 
     assert result.exit_code == 0
     assert "memoryWindow" in result.stdout
-    assert "no longer used" in result.stdout
+    assert "больше не используется" in result.stdout
 
 
 def test_heartbeat_retains_recent_messages_by_default():
@@ -2109,7 +2109,7 @@ def test_gateway_uses_configured_port_when_cli_flag_is_missing(monkeypatch, tmp_
     result = runner.invoke(app, ["gateway", "--config", str(config_file)])
 
     assert isinstance(result.exception, _StopGatewayError)
-    assert "port 18791" in result.stdout
+    assert "18791" in result.stdout
 
 
 def test_gateway_cli_port_overrides_configured_port(monkeypatch, tmp_path: Path) -> None:
@@ -2126,7 +2126,7 @@ def test_gateway_cli_port_overrides_configured_port(monkeypatch, tmp_path: Path)
     result = runner.invoke(app, ["gateway", "--config", str(config_file), "--port", "18792"])
 
     assert isinstance(result.exception, _StopGatewayError)
-    assert "port 18792" in result.stdout
+    assert "18792" in result.stdout
 
 
 def test_gateway_health_endpoint_binds_and_serves_expected_responses(

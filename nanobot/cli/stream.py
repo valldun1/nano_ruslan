@@ -48,7 +48,7 @@ class ThinkingSpinner:
     def __init__(self, console: Console | None = None, bot_name: str = "nanobot"):
         c = console or _make_console()
         self._console = c
-        self._spinner = c.status(f"[dim]{bot_name} is thinking...[/dim]", spinner="dots")
+        self._spinner = c.status(f"[bright_black]{bot_name} думает...[/bright_black]", spinner="dots")
         self._active = False
 
     def __enter__(self):

@@ -111,7 +111,7 @@ File operations have path traversal protection, but:
 
 **WhatsApp:**
 - Keep the neonize session database under `~/.nanobot/whatsapp-auth` secure (mode 0700).
-- Use `nanobot channels login whatsapp --force` to remove and recreate the local session database when rotating linked devices.
+- Use `nanoruslan channels login whatsapp --force` to remove and recreate the local session database when rotating linked devices.
 
 ### 6. Dependency Security
 
@@ -123,12 +123,12 @@ pip install pip-audit
 pip-audit
 
 # Update to latest secure versions
-pip install --upgrade nanobot-ai
+pip install --upgrade nanoruslan
 ```
 
 **Important Notes:**
 - Keep `litellm` updated to the latest version for security fixes
-- Run `pip-audit` regularly, including optional channel dependencies such as `nanobot-ai[whatsapp]`
+- Run `pip-audit` regularly, including optional channel dependencies such as `nanoruslan[whatsapp]`
 - Subscribe to security advisories for nanobot and its dependencies
 
 ### 7. Production Deployment
@@ -139,13 +139,13 @@ For production use:
    ```bash
    # Run in a container or VM
    docker run --rm -it python:3.11
-   pip install nanobot-ai
+   pip install nanoruslan
    ```
 
 2. **Use a Dedicated User**
    ```bash
    sudo useradd -m -s /bin/bash nanobot
-   sudo -u nanobot nanobot gateway
+   sudo -u nanobot nanoruslan gateway
    ```
 
 3. **Set Proper Permissions**
@@ -169,7 +169,7 @@ For production use:
 6. **Regular Updates**
    ```bash
    # Check for updates weekly
-   pip install --upgrade nanobot-ai
+   pip install --upgrade nanoruslan
    ```
 
 ### 8. Development vs Production

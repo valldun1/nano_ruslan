@@ -1,4 +1,4 @@
-"""CLI commands for nanobot."""
+"""CLI команды для NanoRuslan."""
 
 import asyncio
 import os
@@ -126,7 +126,7 @@ def _install_gateway_shutdown_handlers(
             return
         shutdown_requested = True
         logger.info("Gateway shutdown requested by {}", sig_name)
-        print_status("\nShutting down... Press Ctrl+C again to force.")
+        print_status("\nЗавершение работы... Нажми Ctrl+C снова для принудительного завершения.")
         shutdown_event.set()
 
     for signum in (signal.SIGINT, signal.SIGTERM):
@@ -173,7 +173,7 @@ class SafeFileHistory(FileHistory):
 
 
 app = typer.Typer(
-    name="nanobot",
+    name="nanoruslan",
     context_settings={"help_option_names": ["-h", "--help"]},
     help=f"{__logo__} NanoRuslan — лёгкий AI-агент для русскоязычных",
     no_args_is_help=True,
@@ -350,7 +350,7 @@ async def _print_interactive_line(text: str) -> None:
     """Print async interactive updates with prompt_toolkit-safe Rich styling."""
     def _write() -> None:
         ansi = _render_interactive_ansi(
-            lambda c: c.print(f"  [dim]↳ {text}[/dim]")
+            lambda c: c.print(f"  [bright_black]↳ {text}[/bright_black]")
         )
         print_formatted_text(ANSI(ansi), end="")
 
@@ -387,7 +387,7 @@ def _print_cli_progress_line(text: str, thinking: ThinkingSpinner | None, render
     with pause:
         if renderer:
             renderer.ensure_header()
-        target.print(f"  [dim]↳ {text}[/dim]")
+        target.print(f"  [bright_black]↳ {text}[/bright_black]")
 
 
 class _ReasoningBuffer:
@@ -448,7 +448,7 @@ async def _print_interactive_progress_line(text: str, thinking: ThinkingSpinner 
     if renderer:
         with renderer.pause_spinner():
             renderer.ensure_header()
-            renderer.console.print(f"  [dim]↳ {text}[/dim]")
+            renderer.console.print(f"  [bright_black]↳ {text}[/bright_black]")
     else:
         with thinking.pause() if thinking else nullcontext():
             await _print_interactive_line(text)
@@ -533,7 +533,7 @@ def main(
         None, "--version", "-v", callback=version_callback, is_eager=True
     ),
 ):
-    """nanobot - Personal AI Assistant."""
+    """NanoRuslan - личный AI-помощник."""
     pass
 
 
@@ -544,18 +544,18 @@ def main(
 
 @app.command()
 def onboard(
-    workspace: str | None = typer.Option(None, "--workspace", "-w", help="Workspace directory"),
-    config: str | None = typer.Option(None, "--config", "-c", help="Path to config file"),
-    wizard: bool = typer.Option(False, "--wizard", help="Use interactive wizard"),
+    workspace: str | None = typer.Option(None, "--workspace", "-w", help="Рабочая директория"),
+    config: str | None = typer.Option(None, "--config", "-c", help="Путь к файлу конфигурации"),
+    wizard: bool = typer.Option(False, "--wizard", help="Интерактивный мастер настройки"),
 ):
-    """Initialize nanobot configuration and workspace."""
+    """Настройка конфигурации и рабочей директории."""
     from nanobot.config.loader import get_config_path, load_config, save_config, set_config_path
     from nanobot.config.schema import Config
 
     if config:
         config_path = Path(config).expanduser().resolve()
         set_config_path(config_path)
-        console.print(f"[dim]Using config: {config_path}[/dim]")
+        console.print(f"[bright_black]Конфиг: {config_path}[/bright_black]")
     else:
         config_path = get_config_path()
 
@@ -569,29 +569,29 @@ def onboard(
         if wizard:
             config = _apply_workspace_override(load_config(config_path))
         else:
-            console.print(f"[yellow]Config already exists at {config_path}[/yellow]")
+            console.print(f"[yellow]Конфиг уже есть: {config_path}[/yellow]")
             console.print(
-                "  [bold]y[/bold] = overwrite with defaults (existing values will be lost)"
+                "  [bold]y[/bold] = перезаписать умолчаниями (текущие значения будут потеряны)"
             )
             console.print(
-                "  [bold]N[/bold] = refresh config, keeping existing values and adding new fields"
+                "  [bold]N[/bold] = обновить конфиг, сохранив текущие значения и добавив новые поля"
             )
-            if typer.confirm("Overwrite?"):
+            if typer.confirm("Перезаписать?"):
                 config = _apply_workspace_override(Config())
                 save_config(config, config_path)
-                console.print(f"[green]✓[/green] Config reset to defaults at {config_path}")
+                console.print(f"[green]✓[/green] Конфиг сброшен на умолчания: {config_path}")
             else:
                 config = _apply_workspace_override(load_config(config_path))
                 save_config(config, config_path)
                 console.print(
-                    f"[green]✓[/green] Config refreshed at {config_path} (existing values preserved)"
+                    f"[green]✓[/green] Конфиг обновлён: {config_path} (текущие значения сохранены)"
                 )
     else:
         config = _apply_workspace_override(Config())
         # In wizard mode, don't save yet - the wizard will handle saving if should_save=True
         if not wizard:
             save_config(config, config_path)
-            console.print(f"[green]✓[/green] Created config at {config_path}")
+            console.print(f"[green]✓[/green] Конфиг создан: {config_path}")
 
     # Run interactive wizard if enabled
     if wizard:
@@ -600,15 +600,15 @@ def onboard(
         try:
             result = run_onboard(initial_config=config)
             if not result.should_save:
-                console.print("[yellow]Configuration discarded. No changes were saved.[/yellow]")
+                console.print("[yellow]Конфигурация отменена. Изменения не сохранены.[/yellow]")
                 return
 
             config = result.config
             save_config(config, config_path)
-            console.print(f"[green]✓[/green] Config saved at {config_path}")
+            console.print(f"[green]✓[/green] Конфиг сохранён: {config_path}")
         except Exception as e:
-            console.print(f"[red]✗[/red] Error during configuration: {e}")
-            console.print("[yellow]Please run 'nanobot onboard' again to complete setup.[/yellow]")
+            console.print(f"[red]✓[/red] Ошибка при настройке: {e}")
+            console.print("[yellow]Запусти 'nanoruslan onboard' ещё раз для завершения настройки.[/yellow]")
             raise typer.Exit(1)
     _onboard_plugins(config_path)
 
@@ -616,27 +616,27 @@ def onboard(
     workspace_path = get_workspace_path(config.workspace_path)
     if not workspace_path.exists():
         workspace_path.mkdir(parents=True, exist_ok=True)
-        console.print(f"[green]✓[/green] Created workspace at {workspace_path}")
+        console.print(f"[green]✓[/green] Рабочая директория создана: {workspace_path}")
 
     sync_workspace_templates(workspace_path)
 
-    agent_cmd = 'nanobot agent -m "Hello!"'
-    gateway_cmd = "nanobot gateway"
+    agent_cmd =  'nanoruslan agent -m "Hello!"'
+    gateway_cmd = "nanoruslan gateway"
     if config:
         agent_cmd += f" --config {config_path}"
         gateway_cmd += f" --config {config_path}"
 
     console.print(f'\n{__logo__} NanoRuslan готов!')
-    console.print("\nNext steps:")
+    console.print("\nСледующие шаги:")
     if wizard:
         console.print(f"  1. Chat: [cyan]{agent_cmd}[/cyan]")
         console.print(f"  2. Start gateway: [cyan]{gateway_cmd}[/cyan]")
     else:
-        console.print(f"  1. Add your API key to [cyan]{config_path}[/cyan]")
-        console.print("     Get one at: https://openrouter.ai/keys")
+        console.print(f"  1. Добавь API-ключ в [cyan]{config_path}[/cyan]")
+        console.print("     Получи ключ: https://openrouter.ai/keys")
         console.print(f"  2. Chat: [cyan]{agent_cmd}[/cyan]")
     console.print(
-        "\n[dim]Want Telegram/WhatsApp? See: https://github.com/HKUDS/nanobot#-chat-apps[/dim]"
+        "Нужен Telegram/WhatsApp? См.: https://github.com/HKUDS/nanobot#-chat-apps",
     )
 
 
@@ -694,10 +694,10 @@ def _load_runtime_config(config: str | None = None, workspace: str | None = None
     if config:
         config_path = Path(config).expanduser().resolve()
         if not config_path.exists():
-            console.print(f"[red]Error: Config file not found: {config_path}[/red]")
+            console.print(f"[red]Ошибка: файл конфигурации не найден: {config_path}[/red]")
             raise typer.Exit(1)
         set_config_path(config_path)
-        console.print(f"[dim]Using config: {config_path}[/dim]")
+        console.print(f"[bright_black]Конфиг: {config_path}[/bright_black]")
 
     try:
         loaded = resolve_config_env_vars(load_config(config_path))
@@ -711,7 +711,7 @@ def _load_runtime_config(config: str | None = None, workspace: str | None = None
 
 
 def _warn_deprecated_config_keys(config_path: Path | None) -> None:
-    """Hint users to remove obsolete keys from their config file."""
+    """Подсказать удалить устаревшие ключи из конфига."""
     import json
 
     from nanobot.config.loader import get_config_path
@@ -723,8 +723,8 @@ def _warn_deprecated_config_keys(config_path: Path | None) -> None:
         return
     if "memoryWindow" in raw.get("agents", {}).get("defaults", {}):
         console.print(
-            "[dim]Hint: `memoryWindow` in your config is no longer used "
-            "and can be safely removed.[/dim]"
+            "[bright_black]Подсказка: `memoryWindow` в конфиге больше не используется "
+            "и может быть безопасно удалено.[/bright_black]"
         )
 
 
@@ -748,18 +748,18 @@ def _migrate_cron_store(config: "Config") -> None:
 
 @app.command()
 def serve(
-    port: int | None = typer.Option(None, "--port", "-p", help="API server port"),
-    host: str | None = typer.Option(None, "--host", "-H", help="Bind address"),
-    timeout: float | None = typer.Option(None, "--timeout", "-t", help="Per-request timeout (seconds)"),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show nanobot runtime logs"),
-    workspace: str | None = typer.Option(None, "--workspace", "-w", help="Workspace directory"),
-    config: str | None = typer.Option(None, "--config", "-c", help="Path to config file"),
+    port: int | None = typer.Option(None, "--port", "-p", help="Порт API-сервера"),
+    host: str | None = typer.Option(None, "--host", "-H", help="IP-адрес для привязки"),
+    timeout: float | None = typer.Option(None, "--timeout", "-t", help="Таймаут запроса (сек)"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Показывать логи NanoRuslan"),
+    workspace: str | None = typer.Option(None, "--workspace", "-w", help="Рабочая директория"),
+    config: str | None = typer.Option(None, "--config", "-c", help="Путь к файлу конфигурации"),
 ):
-    """Start the OpenAI-compatible API server (/v1/chat/completions)."""
+    """Запуск OpenAI-совместимого API-сервера (/v1/chat/completions)."""
     try:
         from aiohttp import web  # noqa: F401
     except ImportError:
-        console.print("[red]aiohttp is required. Install with: pip install 'nanobot-ai[api]'[/red]")
+        console.print("[red]aiohttp необходим. Установи: pip install 'nanoruslan[api]'[/red]")
         raise typer.Exit(1)
 
     from loguru import logger
@@ -793,11 +793,11 @@ def serve(
         raise typer.Exit(1) from exc
 
     model_name, preset_tag = _model_display(runtime_config)
-    console.print(f"{__logo__} Starting OpenAI-compatible API server")
+    console.print(f"{__logo__} Запуск API-сервера")
     console.print(f"  [cyan]Endpoint[/cyan] : http://{host}:{port}/v1/chat/completions")
     console.print(f"  [cyan]Model[/cyan]    : {model_name}{preset_tag}")
     console.print("  [cyan]Session[/cyan]  : api:default")
-    console.print(f"  [cyan]Timeout[/cyan]  : {timeout}s")
+    console.print(f"  [cyan]Тайм-аут[/cyan]  : {timeout}с")
     if host in {"0.0.0.0", "::"}:
         console.print(
             "[yellow]Warning:[/yellow] API is bound to all interfaces. "
@@ -851,7 +851,7 @@ def _run_gateway(
 
     port = port if port is not None else config.gateway.port
 
-    console.print(f"{__logo__} Starting nanobot gateway version {__version__} on port {port}...")
+    console.print(f"{__logo__} Запуск NanoRuslan gateway версии {__version__} на порту {port}...")
     sync_workspace_templates(config.workspace_path)
     bus = MessageBus()
     runtime_events = RuntimeEventBus()
@@ -1108,13 +1108,13 @@ def _run_gateway(
 
     cron_status = cron.status()
     if cron_status["jobs"] > 0:
-        console.print(f"[green]✓[/green] Cron: {cron_status['jobs']} scheduled jobs")
+        console.print(f"[green]✓[/green] Cron: {cron_status['jobs']} задач по расписанию")
 
     hb_cfg = config.gateway.heartbeat
     if hb_cfg.enabled:
-        console.print(f"[green]✓[/green] Heartbeat: every {hb_cfg.interval_s}s")
+        console.print(f"[green]✓[/green] Heartbeat: каждые {hb_cfg.interval_s} сек")
     else:
-        console.print("[yellow]✗[/yellow] Heartbeat: disabled")
+        console.print("[yellow]✗[/yellow] Heartbeat: отключен")
 
     async def _health_server(host: str, health_port: int):
         """Lightweight HTTP health endpoint on the gateway port."""
@@ -1170,7 +1170,7 @@ def _run_gateway(
         ))
         console.print(f"[green]✓[/green] Dream: {dream_cfg.describe_schedule()}")
     else:
-        console.print("[yellow]○[/yellow] Dream: disabled")
+        console.print("[yellow]○[/yellow] Dream: отключен")
         _advance_dream_cursor_if_behind(agent.context.memory)
 
     # Register Heartbeat system job (idempotent on restart)
@@ -1205,9 +1205,9 @@ def _run_gateway(
                 await asyncio.sleep(0.1)
         try:
             webbrowser.open(open_browser_url)
-            console.print(f"[green]✓[/green] Opened browser at {open_browser_url}")
+            console.print(f"[green]✓[/green] Браузер открыт на {open_browser_url}")
         except Exception as e:
-            console.print(f"[yellow]Could not open browser ({e}); visit {open_browser_url}[/yellow]")
+            console.print(f"[yellow]Не удалось открыть браузер ({e}); открой {open_browser_url}[/yellow]")
 
     async def run():
         tasks: list[asyncio.Task] = []
@@ -1253,11 +1253,11 @@ def _run_gateway(
             elif runtime_tasks is not None:
                 runtime_tasks.cancel()
         except KeyboardInterrupt:
-            console.print("\nShutting down...")
+            console.print("\nЗавершение работы...")
         except Exception:
             import traceback
 
-            console.print("\n[red]Error: Gateway crashed unexpectedly[/red]")
+            console.print("\n[red]Ошибка: Gateway неожиданно завершил работу[/red]")
             console.print(traceback.format_exc())
         finally:
             try:
@@ -1306,14 +1306,14 @@ app.add_typer(
 
 @app.command()
 def agent(
-    message: str = typer.Option(None, "--message", "-m", help="Message to send to the agent"),
-    session_id: str = typer.Option("cli:direct", "--session", "-s", help="Session ID"),
-    workspace: str | None = typer.Option(None, "--workspace", "-w", help="Workspace directory"),
-    config: str | None = typer.Option(None, "--config", "-c", help="Config file path"),
-    markdown: bool = typer.Option(True, "--markdown/--no-markdown", help="Render assistant output as Markdown"),
-    logs: bool = typer.Option(False, "--logs/--no-logs", help="Show nanobot runtime logs during chat"),
+    message: str = typer.Option(None, "--message", "-m", help="Сообщение для агента"),
+    session_id: str = typer.Option("cli:direct", "--session", "-s", help="ID сессии"),
+    workspace: str | None = typer.Option(None, "--workspace", "-w", help="Рабочая директория"),
+    config: str | None = typer.Option(None, "--config", "-c", help="Путь к файлу конфигурации"),
+    markdown: bool = typer.Option(True, "--markdown/--no-markdown", help="Форматировать ответ как Markdown"),
+    logs: bool = typer.Option(False, "--logs/--no-logs", help="Показывать логи NanoRuslan в чате"),
 ):
-    """Interact with the agent directly."""
+    """Диалог с агентом напрямую."""
     from loguru import logger
 
     from nanobot.bus.queue import MessageBus
@@ -1419,7 +1419,7 @@ def agent(
         _init_prompt_session()
         _model, _preset_tag = _model_display(config)
         _icon = config.agents.defaults.bot_icon or __logo__
-        console.print(f"{_icon} Interactive mode [bold blue]({_model})[/bold blue]{_preset_tag} — type [bold]exit[/bold] or [bold]Ctrl+C[/bold] to quit\n")
+        console.print(f"{_icon} Интерактивный режим [bold blue]({_model})[/bold blue]{_preset_tag} — введи [bold]exit[/bold] или [bold]Ctrl+C[/bold] для выхода\n")
 
         if ":" in session_id:
             cli_channel, cli_chat_id = session_id.split(":", 1)
@@ -1510,7 +1510,7 @@ def agent(
 
                         if _is_exit_command(command):
                             _restore_terminal()
-                            console.print("\nGoodbye!")
+                            console.print("\nДо встречи!")
                             break
 
                         turn_done.clear()
@@ -1550,11 +1550,11 @@ def agent(
                             await renderer.close()
                     except KeyboardInterrupt:
                         _restore_terminal()
-                        console.print("\nGoodbye!")
+                        console.print("\nДо встречи!")
                         break
                     except EOFError:
                         _restore_terminal()
-                        console.print("\nGoodbye!")
+                        console.print("\nДо встречи!")
                         break
             finally:
                 agent_loop.stop()
@@ -1570,15 +1570,15 @@ def agent(
 # ============================================================================
 
 
-channels_app = typer.Typer(help="Manage channels")
+channels_app = typer.Typer(help="Управление каналами")
 app.add_typer(channels_app, name="channels")
 
 
 @channels_app.command("status")
 def channels_status(
-    config_path: str | None = typer.Option(None, "--config", "-c", help="Path to config file"),
+    config_path: str | None = typer.Option(None, "--config", "-c", help="Путь к файлу конфигурации"),
 ):
-    """Show channel status."""
+    """Статус каналов связи."""
     from nanobot.channels.registry import discover_all
     from nanobot.config.loader import load_config, set_config_path
 
@@ -1602,7 +1602,7 @@ def channels_status(
             enabled = getattr(section, "enabled", False)
         table.add_row(
             cls.display_name,
-            "[green]\u2713[/green]" if enabled else "[dim]\u2717[/dim]",
+            "[green]\u2713[/green]" if enabled else "[bright_black]\u2717[/bright_black]",
         )
 
     console.print(table)
@@ -1610,11 +1610,11 @@ def channels_status(
 
 @channels_app.command("login")
 def channels_login(
-    channel_name: str = typer.Argument(..., help="Channel name (e.g. weixin, whatsapp)"),
-    force: bool = typer.Option(False, "--force", "-f", help="Force re-authentication even if already logged in"),
-    config_path: str | None = typer.Option(None, "--config", "-c", help="Path to config file"),
+    channel_name: str = typer.Argument(..., help="Название канала (напр. weixin, whatsapp)"),
+    force: bool = typer.Option(False, "--force", "-f", help="Принудительная переавторизация"),
+    config_path: str | None = typer.Option(None, "--config", "-c", help="Путь к файлу конфигурации"),
 ):
-    """Authenticate with a channel via QR code or other interactive login."""
+    """Авторизация в канале по QR-коду или ссылке."""
     from nanobot.channels.registry import discover_all
     from nanobot.config.loader import load_config, set_config_path
 
@@ -1647,13 +1647,13 @@ def channels_login(
 # Plugin Commands
 # ============================================================================
 
-plugins_app = typer.Typer(help="Manage channel plugins")
+plugins_app = typer.Typer(help="Управление плагинами каналов")
 app.add_typer(plugins_app, name="plugins")
 
 
 @plugins_app.command("list")
 def plugins_list():
-    """List all discovered channels (built-in and plugins)."""
+    """Список всех каналов (встроенные и плагины)."""
     from nanobot.channels.registry import discover_all, discover_channel_names
     from nanobot.config.loader import load_config
 
@@ -1679,7 +1679,7 @@ def plugins_list():
         table.add_row(
             cls.display_name,
             source,
-            "[green]yes[/green]" if enabled else "[dim]no[/dim]",
+            "[green]yes[/green]" if enabled else "[bright_black]no[/bright_black]",
         )
 
     console.print(table)
@@ -1692,14 +1692,14 @@ def plugins_list():
 
 @app.command()
 def status():
-    """Show nanobot status."""
+    """Показать статус NanoRuslan."""
     from nanobot.config.loader import get_config_path, load_config
 
     config_path = get_config_path()
     config = load_config()
     workspace = config.workspace_path
 
-    console.print(f"{__logo__} nanobot Status\n")
+    console.print(f"{__logo__} NanoRuslan Status\n")
 
     console.print(f"Config: {config_path} {'[green]✓[/green]' if config_path.exists() else '[red]✗[/red]'}")
     console.print(f"Workspace: {workspace} {'[green]✓[/green]' if workspace.exists() else '[red]✗[/red]'}")
@@ -1722,17 +1722,17 @@ def status():
                 if p.api_base:
                     console.print(f"{spec.label}: [green]✓ {p.api_base}[/green]")
                 else:
-                    console.print(f"{spec.label}: [dim]not set[/dim]")
+                    console.print(f"{spec.label}: [bright_black]не задано[/bright_black]")
             else:
                 has_key = bool(p.api_key)
-                console.print(f"{spec.label}: {'[green]✓[/green]' if has_key else '[dim]not set[/dim]'}")
+                console.print(f"{spec.label}: {'[green]✓[/green]' if has_key else '[bright_black]не задано[/bright_black]'}")
 
 
 # ============================================================================
 # OAuth Login
 # ============================================================================
 
-provider_app = typer.Typer(help="Manage providers")
+provider_app = typer.Typer(help="Управление провайдерами")
 app.add_typer(provider_app, name="provider")
 
 
@@ -1775,7 +1775,7 @@ def _resolve_oauth_provider(provider: str):
     spec = next((s for s in PROVIDERS if s.name == key and s.is_oauth), None)
     if not spec:
         names = ", ".join(s.name.replace("_", "-") for s in PROVIDERS if s.is_oauth)
-        console.print(f"[red]Unknown OAuth provider: {provider}[/red]  Supported: {names}")
+        console.print(f"[red]Неизвестный OAuth-провайдер: {provider}[/red]  Поддерживаются: {names}")
         raise typer.Exit(1)
     return spec
 
@@ -1792,7 +1792,7 @@ def _set_oauth_provider_as_main(
     resolved_config_path = Path(config_path).expanduser().resolve() if config_path else None
     if resolved_config_path is not None:
         set_config_path(resolved_config_path)
-        console.print(f"[dim]Using config: {resolved_config_path}[/dim]")
+        console.print(f"[bright_black]Using config: {resolved_config_path}[/bright_black]")
 
     config = load_config(resolved_config_path)
     selected_model = (model or "").strip() or _OAUTH_PROVIDER_DEFAULT_MODELS[provider_name]
@@ -1803,38 +1803,38 @@ def _set_oauth_provider_as_main(
 
     saved_path = resolved_config_path or get_config_path()
     console.print(
-        f"[green]✓ Set {provider_name.replace('_', '-')} as the main provider[/green]  "
-        f"[dim]{selected_model}[/dim]"
+        f"[green]✓ {provider_name.replace('_', '-')} установлен как основной провайдер[/green]  "
+        f"[bright_black]{selected_model}[/bright_black]"
     )
-    console.print(f"[dim]Saved: {saved_path}[/dim]")
+    console.print(f"[bright_black]Saved: {saved_path}[/bright_black]")
 
 
 @provider_app.command("login")
 def provider_login(
-    provider: str = typer.Argument(..., help="OAuth provider (e.g. 'openai-codex', 'github-copilot')"),
+    provider: str = typer.Argument(..., help="OAuth-провайдер (напр. 'openai-codex', 'github-copilot')"),
     set_main: bool = typer.Option(
         False,
         "--set-main",
         "--main",
-        help="Set this OAuth provider as the active agent provider after login",
+        help="Сделать этого провайдера основным после авторизации",
     ),
     model: str | None = typer.Option(
         None,
         "--model",
         "-m",
-        help="Model to use when setting this provider as the active provider",
+        help="Модель для использования при активации провайдера",
     ),
-    config: str | None = typer.Option(None, "--config", "-c", help="Path to config file"),
+    config: str | None = typer.Option(None, "--config", "-c", help="Путь к файлу конфигурации"),
 ):
-    """Authenticate with an OAuth provider."""
+    """Авторизация в OAuth-провайдере."""
     spec = _resolve_oauth_provider(provider)
 
     handler = _LOGIN_HANDLERS.get(spec.name)
     if not handler:
-        console.print(f"[red]Login not implemented for {spec.label}[/red]")
+        console.print(f"[red]Вход не реализован для {spec.label}[/red]")
         raise typer.Exit(1)
 
-    console.print(f"{__logo__} OAuth Login - {spec.label}\n")
+    console.print(f"{__logo__} OAuth Вход - {spec.label}\n")
     handler()
     if set_main or model:
         _set_oauth_provider_as_main(spec.name, model=model, config_path=config)
@@ -1842,17 +1842,17 @@ def provider_login(
 
 @provider_app.command("logout")
 def provider_logout(
-    provider: str = typer.Argument(..., help="OAuth provider (e.g. 'openai-codex', 'github-copilot')"),
+    provider: str = typer.Argument(..., help="OAuth-провайдер (напр. 'openai-codex', 'github-copilot')"),
 ):
-    """Log out from an OAuth provider."""
+    """Выйти из OAuth-провайдера."""
     spec = _resolve_oauth_provider(provider)
 
     handler = _LOGOUT_HANDLERS.get(spec.name)
     if not handler:
-        console.print(f"[red]Logout not implemented for {spec.label}[/red]")
+        console.print(f"[red]Выход не реализован для {spec.label}[/red]")
         raise typer.Exit(1)
 
-    console.print(f"{__logo__} OAuth Logout - {spec.label}\n")
+    console.print(f"{__logo__} OAuth Выход - {spec.label}\n")
     handler()
 
 
@@ -1873,18 +1873,18 @@ def _login_openai_codex() -> None:
         with suppress(Exception):
             token = get_token(proxy=proxy)
         if not (token and token.access):
-            console.print("[cyan]Starting interactive OAuth login...[/cyan]\n")
+            console.print("[cyan]Запуск интерактивной OAuth-авторизации...[/cyan]\n")
             token = login_oauth_interactive(
                 print_fn=lambda s: console.print(s),
                 prompt_fn=lambda s: typer.prompt(s),
                 proxy=proxy,
             )
         if not (token and token.access):
-            console.print("[red]✗ Authentication failed[/red]")
+            console.print("[red]✓ Ошибка авторизации[/red]")
             raise typer.Exit(1)
-        console.print(f"[green]✓ Authenticated with OpenAI Codex[/green]  [dim]{token.account_id}[/dim]")
+        console.print(f"[green]✓ Авторизован в OpenAI Codex[/green]  [bright_black]{token.account_id}[/bright_black]")
     except ImportError:
-        console.print("[red]oauth_cli_kit not installed. Run: pip install oauth-cli-kit[/red]")
+        console.print("[red]oauth_cli_kit не установлен. Запусти: pip install oauth-cli-kit[/red]")
         raise typer.Exit(1)
 
 
@@ -1895,7 +1895,7 @@ def _logout_openai_codex() -> None:
         from oauth_cli_kit.providers import OPENAI_CODEX_PROVIDER
         from oauth_cli_kit.storage import FileTokenStorage
     except ImportError:
-        console.print("[red]oauth_cli_kit not installed. Run: pip install oauth-cli-kit[/red]")
+        console.print("[red]oauth_cli_kit не установлен. Запусти: pip install oauth-cli-kit[/red]")
         raise typer.Exit(1)
 
     storage = FileTokenStorage(token_filename=OPENAI_CODEX_PROVIDER.token_filename)
@@ -1908,7 +1908,7 @@ def _logout_github_copilot() -> None:
     try:
         from nanobot.providers.github_copilot_provider import get_storage
     except ImportError:
-        console.print("[red]GitHub Copilot provider unavailable. Ensure oauth-cli-kit is installed.[/red]")
+        console.print("[red]Провайдер GitHub Copilot недоступен. Убедись, что oauth-cli-kit установлен.[/red]")
         raise typer.Exit(1)
 
     storage = get_storage()
@@ -1930,15 +1930,15 @@ def _delete_oauth_files(token_path: Path, provider_label: str) -> None:
         removed_paths.append(path)
 
     if not removed_paths and not skipped:
-        console.print(f"[yellow]! No local OAuth credentials found for {provider_label}[/yellow]")
+        console.print(f"[yellow]! Локальные OAuth-учётные данные для {provider_label} не найдены[/yellow]")
         return
 
     if removed_paths:
-        console.print(f"[green]✓ Logged out from {provider_label}[/green]")
+        console.print(f"[green]✓ Выход выполнен из {provider_label}[/green]")
         for path in removed_paths:
-            console.print(f"[dim]Removed: {path}[/dim]")
+            console.print(f"[bright_black]Удалено: {path}[/bright_black]")
     for path, exc in skipped:
-        console.print(f"[yellow]! Could not remove {path}: {exc}[/yellow]")
+        console.print(f"[yellow]! Не удалось удалить {path}: {exc}[/yellow]")
 
 
 @_register_login("github_copilot")
@@ -1946,15 +1946,15 @@ def _login_github_copilot() -> None:
     try:
         from nanobot.providers.github_copilot_provider import login_github_copilot
 
-        console.print("[cyan]Starting GitHub Copilot device flow...[/cyan]\n")
+        console.print("[cyan]Запуск GitHub Copilot device flow...[/cyan]\n")
         token = login_github_copilot(
             print_fn=lambda s: console.print(s),
             prompt_fn=lambda s: typer.prompt(s),
         )
         account = token.account_id or "GitHub"
-        console.print(f"[green]✓ Authenticated with GitHub Copilot[/green]  [dim]{account}[/dim]")
+        console.print(f"[green]✓ Авторизован в GitHub Copilot[/green]  [bright_black]{account}[/bright_black]")
     except Exception as e:
-        console.print(f"[red]Authentication error: {e}[/red]")
+        console.print(f"[red]Ошибка авторизации: {e}[/red]")
         raise typer.Exit(1)
 
 

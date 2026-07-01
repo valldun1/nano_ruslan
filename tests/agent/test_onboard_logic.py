@@ -286,16 +286,16 @@ class TestFormatValue:
     """Tests for _format_value display formatting."""
 
     def test_formats_none_as_not_set(self):
-        assert "not set" in _format_value(None)
+        assert "не задано" in _format_value(None)
 
     def test_formats_empty_string_as_not_set(self):
-        assert "not set" in _format_value("")
+        assert "не задано" in _format_value("")
 
     def test_formats_empty_dict_as_not_set(self):
-        assert "not set" in _format_value({})
+        assert "не задано" in _format_value({})
 
     def test_formats_empty_list_as_not_set(self):
-        assert "not set" in _format_value([])
+        assert "не задано" in _format_value([])
 
     def test_formats_string_value(self):
         result = _format_value("hello")
@@ -513,10 +513,10 @@ class TestRunOnboardExitBehavior:
 
         responses = iter(
             [
-                "[A] Advanced Settings",
-                "[A] Agent Settings",
+                "[A] Расширенные настройки",
+                "[N] Настройки агента",
                 KeyboardInterrupt(),
-                "[X] Exit Without Saving",
+                "[X] Выйти без сохранения",
             ]
         )
 
@@ -886,21 +886,21 @@ class TestMainMenuUpdate:
         dirty_choices = _get_main_menu_choices(True)
 
         assert clean_choices == [
-            "[Q] Quick Start",
-            "[A] Advanced Settings",
-            "[X] Exit",
+            "[Q] Быстрый старт",
+            "[A] Расширенные настройки",
+            "[X] Выход",
         ]
-        assert "[S] Save and Exit" not in clean_choices
-        assert "[V] View Configuration Summary" not in clean_choices
-        assert "[S] Save and Exit" in dirty_choices
-        assert "[X] Exit Without Saving" in dirty_choices
+        assert "[S] Сохранить и выйти" not in clean_choices
+        assert "[V] Просмотр конфигурации" not in clean_choices
+        assert "[S] Сохранить и выйти" in dirty_choices
+        assert "[X] Выйти без сохранения" in dirty_choices
 
     def test_run_onboard_quick_start_edit(self, monkeypatch):
         """run_onboard should route [Q] to Quick Start."""
         initial_config = Config()
 
         responses = iter([
-            "[Q] Quick Start",
+            "[Q] Быстрый старт",
         ])
 
         def fake_select_with_back(*_args, **_kwargs):
@@ -923,14 +923,14 @@ class TestMainMenuUpdate:
         """Returning from Advanced should not leave its item visually selected."""
         initial_config = Config()
         responses = iter([
-            "[A] Advanced Settings",
-            "<- Back",
-            "[X] Exit",
+            "[A] Расширенные настройки",
+            "<- Назад",
+            "[X] Выход",
         ])
         main_defaults: list[str | None] = []
 
         def fake_select_with_back(prompt, _choices, default=None):
-            if prompt == "What would you like to do?":
+            if prompt == "Что делаем?":
                 main_defaults.append(default)
             return next(responses)
 
@@ -1350,7 +1350,7 @@ class TestMainMenuUpdate:
 
         assert onboard_wizard._enable_quick_start_websocket_defaults(config) is True
 
-        assert any("WebSocket channel" in message for message in messages)
+        assert any("WebSocket-канал" in message for message in messages)
         assert any("http://127.0.0.1:8765" in message for message in messages)
         websocket = getattr(config.channels, "websocket")
         assert websocket["enabled"] is True
@@ -1458,7 +1458,7 @@ class TestMainMenuUpdate:
         rows = dict(captured["rows"])
         assert rows["Status"] == "DeepSeek API key missing"
         assert "API key" in rows["Next"]
-        assert "nanobot gateway" in rows["Next"]
+        assert "nanoruslan gateway" in rows["Next"]
         assert "agent -m" not in rows["Next"]
         assert labels.index("Next") < labels.index("Open")
         assert "Model" not in rows
@@ -1545,10 +1545,10 @@ class TestMainMenuUpdate:
         initial_config = Config()
 
         responses = iter([
-            "[A] Advanced Settings",
-            "[H] Channel Common",
+            "[A] Расширенные настройки",
+            "[H] Общие настройки каналов",
             KeyboardInterrupt(),
-            "[S] Save and Exit",
+            "[S] Сохранить и выйти",
         ])
 
         def fake_select_with_back(*_args, **_kwargs):
@@ -1575,10 +1575,10 @@ class TestMainMenuUpdate:
         initial_config = Config()
 
         responses = iter([
-            "[A] Advanced Settings",
-            "[I] API Server",
+            "[A] Расширенные настройки",
+            "[I] API сервер",
             KeyboardInterrupt(),
-            "[S] Save and Exit",
+            "[S] Сохранить и выйти",
         ])
 
         def fake_select_with_back(*_args, **_kwargs):
@@ -1606,10 +1606,10 @@ class TestMainMenuUpdate:
         pause_called = {"n": 0}
 
         responses = iter([
-            "[A] Advanced Settings",
-            "[V] View Configuration Summary",
+            "[A] Расширенные настройки",
+            "[V] Просмотр конфигурации",
             KeyboardInterrupt(),
-            "[X] Exit",
+            "[X] Выход",
         ])
 
         def fake_select_with_back(*_args, **_kwargs):
@@ -1792,9 +1792,9 @@ class TestModelPresetWizard:
         _MODEL_PRESET_CACHE.clear()
 
         responses = iter([
-            "[+] Add new preset",
+            "[+] Добавить новый пресет",
             "my-preset",
-            "<- Back",
+            "<- Назад",
         ])
 
         class FakePrompt:
@@ -1840,7 +1840,7 @@ class TestModelPresetWizard:
             "old - preset - x",
             "Delete",
             True,
-            "<- Back",
+            "<- Назад",
         ])
 
         class FakePrompt:
@@ -1921,10 +1921,10 @@ class TestModelPresetWizard:
         initial_config = Config()
 
         responses = iter([
-            "[A] Advanced Settings",
-            "[M] Model Presets",
+            "[A] Расширенные настройки",
+            "[M] Модели",
             KeyboardInterrupt(),
-            "[S] Save and Exit",
+            "[S] Сохранить и выйти",
         ])
 
         def fake_select_with_back(*_args, **_kwargs):
@@ -1959,7 +1959,7 @@ class TestModelPresetWizard:
         _MODEL_PRESET_CACHE.update({"fast", "default"})
 
         select_responses = iter(["fast"])
-        questionary_responses = iter(["[+] Add preset", "[Done]"])
+        questionary_responses = iter(["[+] Добавить пресет", "[Done]"])
 
         class FakePrompt:
             def __init__(self, response):

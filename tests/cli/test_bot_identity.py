@@ -40,7 +40,7 @@ def test_stream_renderer_propagates_bot_name_to_spinner_text(capsys) -> None:
     # rich.Status keeps the renderable on its internal _renderable attribute;
     # the spinner text is exposed via its underlying status text.
     rendered = spinner._spinner.status
-    assert "mybot is thinking..." in rendered
+    assert "mybot думает..." in rendered
 
 
 def test_stream_renderer_header_combines_icon_and_name() -> None:

@@ -42,7 +42,7 @@ def create_gateway_app(
     service_factory: GatewayServiceFactory | None = None,
 ) -> typer.Typer:
     gateway_app = typer.Typer(
-        help="Start and manage the nanobot gateway.",
+        help="Запуск и управление NanoRuslan gateway.",
         invoke_without_command=True,
         no_args_is_help=False,
     )
@@ -181,7 +181,7 @@ def create_gateway_app(
             raise typer.Exit(runtime.follow_logs(tail=tail))
         lines = runtime.read_log_tail(tail=tail)
         if not lines:
-            console.print("[dim]No gateway log output available yet.[/dim]")
+            console.print("[bright_black]Логи gateway пока недоступны.[/bright_black]")
             return
         for line in lines:
             console.print(line)
@@ -195,9 +195,9 @@ def create_gateway_app(
         """Stop the background gateway."""
         result = runtime_for_instance(workspace=workspace, config=config).stop(timeout_s=timeout)
         if result.ok:
-            console.print("[green]Gateway stopped.[/green]")
+            console.print("[green]Gateway остановлен.[/green]")
         else:
-            console.print(f"[yellow]Gateway was not stopped: {result.message}[/yellow]")
+            console.print(f"[yellow]Gateway не остановлен: {result.message}[/yellow]")
         print_status(result.status)
         if not result.ok and result.message != "gateway_not_running":
             raise typer.Exit(1)

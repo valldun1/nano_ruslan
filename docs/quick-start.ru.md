@@ -7,15 +7,15 @@
 ## Быстрый старт
 
 ```bash
-pip install nanobot-ai
-nanobot onboard --provider openrouter --model deepseek/deepseek-chat
-nanobot gateway
+pip install nanoruslan
+nanoruslan onboard --provider openrouter --model deepseek/deepseek-chat
+nanoruslan gateway
 ```
 
 После этого:
 1. Открой браузер → `http://localhost:8765` — WebUI
 2. Или пиши в Telegram, если настроил бота
-3. Или просто `nanobot agent -m "привет"` — в терминале
+3. Или просто `nanoruslan agent -m "привет"` — в терминале
 
 ## Что умеет
 
@@ -43,7 +43,7 @@ nanobot gateway
 }
 ```
 
-Конфиг лежит в `~/.nanoruslan/config.json`. Создаётся автоматически при `nanobot onboard`.
+Конфиг лежит в `~/.nanoruslan/config.json`. Создаётся автоматически при `nanoruslan onboard`.
 
 ## Каналы связи
 

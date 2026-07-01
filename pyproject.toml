@@ -1,7 +1,7 @@
 [project]
-name = "nanobot-ai"
+name = "nanoruslan"
 version = "0.2.2"
-description = "A lightweight personal AI assistant framework"
+description = "Лёгкий AI-агент для русскоязычных — на базе NanoBot"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -116,7 +116,7 @@ dev = [
 ]
 
 [project.scripts]
-nanobot = "nanobot.cli.commands:app"
+nanoruslan = "nanobot.cli.commands:app"
 
 # Third-party tool plugins register here.  Built-in tools are discovered
 # automatically via pkgutil scanning in ToolLoader.discover().

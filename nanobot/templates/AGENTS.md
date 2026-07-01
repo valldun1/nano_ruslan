@@ -1,24 +1,24 @@
-# Agent Instructions
+# Инструкции агенту
 
-## Workspace Guidance
+## Рабочая директория
 
-Use this file for project-specific preferences, recurring workflow conventions, and instructions you want the agent to remember for this workspace. Keep durable facts about the user in `USER.md`, personality/style guidance in `SOUL.md`, and long-term memory in `memory/MEMORY.md`.
+Используй этот файл для хранения предпочтений проекта, повторяющихся рабочих процессов и инструкций, которые агент должен помнить. Факты о пользователе храни в `USER.md`, стиль и личность в `SOUL.md`, долговременную память в `memory/MEMORY.md`.
 
-## Scheduled Reminders
+## Запланированные напоминания
 
-- Before scheduling reminders, check available skills and follow skill guidance first.
-- Use the built-in `cron` tool to create/list/remove jobs (do not call `nanobot cron` via `exec`).
-- Get USER_ID and CHANNEL from the current session (e.g., `8281248569` and `telegram` from `telegram:8281248569`).
-- Cron jobs run as scheduled turns in the origin chat/session and normally deliver the result back to that channel. Do not use cron for background checks that should stay silent when there is nothing useful to report; use `HEARTBEAT.md` instead.
+- Перед созданием напоминаний проверь доступные навыки и следуй их инструкциям.
+- Используй встроенный инструмент `cron` для создания/просмотра/удаления задач (не вызывай `nanoruslan cron` через `exec`).
+- Получай USER_ID и CHANNEL из текущей сессии (напр., `8281248569` и `telegram` из `telegram:8281248569`).
+- Cron-задачи выполняются по расписанию в исходном чате/сессии и обычно доставляют результат обратно в этот канал. Не используй cron для фоновых проверок, которые должны молчать, когда нечего сообщить; используй `HEARTBEAT.md`.
 
-**Do NOT just write reminders to MEMORY.md** — that won't trigger actual notifications.
+**НЕ записывай напоминания просто в MEMORY.md** — это не вызовет настоящих уведомлений.
 
-## Heartbeat Tasks
+## Heartbeat задачи
 
-`HEARTBEAT.md` is checked periodically by the protected heartbeat cron job that `nanobot gateway` registers when `gateway.heartbeat.enabled` is true. Do not create a duplicate heartbeat job unless the user has disabled the built-in one and explicitly wants a custom schedule.
+`HEARTBEAT.md` периодически проверяется защищённой cron-задачей, которую `nanoruslan gateway` регистрирует при `gateway.heartbeat.enabled=true`. Не создавай дублирующую heartbeat-задачу, если только пользователь не отключил встроенную и явно не запросил свою.
 
-- Use `apply_patch` for normal task-list updates, especially when adding, removing, or changing multiple lines.
-- Use `edit_file` only for small exact replacements copied from the current `HEARTBEAT.md`.
-- Use `write_file` for first creation or intentional full-file rewrites.
+- Используй `apply_patch` для обычных обновлений списка задач, особенно при добавлении, удалении или изменении нескольких строк.
+- Используй `edit_file` только для небольших точных замен, скопированных из текущего `HEARTBEAT.md`.
+- Используй `write_file` для первого создания или преднамеренной полной перезаписи.
 
-When the user asks for a recurring/periodic heartbeat task, or for a periodic background check that should only notify on actionable changes, update `HEARTBEAT.md` instead of creating a one-time reminder. Use the built-in `cron` tool for explicit reminders, scheduled tasks that should report every run, or custom schedules that should not be part of the heartbeat task list.
+Когда пользователь просит повторяющуюся/периодическую heartbeat-задачу или фоновую проверку, которая должна уведомлять только об изменениях, обновляй `HEARTBEAT.md` вместо создания одноразового напоминания. Используй встроенный инструмент `cron` для явных напоминаний, запланированных задач, которые должны отчитываться при каждом запуске, или нестандартных расписаний, не входящих в список heartbeat-задач.
